@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User 
 
 #1-block
 class Product(models.Model):
@@ -89,5 +90,55 @@ class Payment(models.Model):
 #1-block
 
 #2-block
+class ConstructionSite(models.Model):
+    name = models.CharField(max_length=255)
+    responsible_person = models.ForeignKey('ResponsiblePerson', on_delete=models.SET_NULL, null=True)
 
+    def __str__(self):
+        return self.name
+
+class ConstructionSiteImage(models.Model):
+    construction_site = models.ForeignKey(ConstructionSite, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='construction_site_images/')
+    description = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return f"Image for {self.construction_site.name}"
+
+class ResponsiblePerson(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=15)
+
+    def __str__(self):
+        return self.user.get_full_name()
+
+class Store(models.Model):
+    name = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=15)
+    requisite = models.TextField(verbose_name='rekvizitlar')
+
+
+    def __str__(self):
+        return self.name
+
+class PaymentRequest(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
+    construction_site = models.ForeignKey(ConstructionSite, on_delete=models.CASCADE)
+    responsible_person = models.ForeignKey(ResponsiblePerson, on_delete=models.CASCADE)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_requests')
+
+    def __str__(self):
+        return f"Request {self.id} for {self.construction_site}"
 #2-block
