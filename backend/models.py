@@ -87,3 +87,7 @@ class Payment(models.Model):
     def __str__(self):
         return f'{self.driver}'
 #1-block
+
+#2-block
+
+#2-block
