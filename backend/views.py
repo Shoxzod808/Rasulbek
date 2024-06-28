@@ -250,8 +250,9 @@ def index(request):
     if request.user.groups.filter(name='Склад').exists():
         return render(request, 'index-1.html', context)
     # Проверяем, принадлежит ли пользователь к группе "Менеджер"
-    elif request.user.groups.filter(name='Менеджер').exists():
-        return render(request, 'index-2.html', context)
+    elif request.user.groups.filter(name='Бугалтер').exists():
+        return render(request, 'bugalter.html', context)
+    
     else:
         # Если пользователь не входит ни в одну из этих групп
         return HttpResponse("У вас нет прав для просмотра этой страницы.")
