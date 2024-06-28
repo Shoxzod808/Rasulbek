@@ -1,0 +1,50 @@
+{% extends "./base.html" %}
+{% load static %}
+{% load humanize %}
+{% block body %}
+{% include "./header1.html" %}
+<section class="section section-xl bg-catskill">
+  <div class="container">
+    <h2 class="fw-bold">Chiqim</h2>
+
+    <div class="row row-30 text-md-start justify-content-sm-center">
+      {% for driver in drivers %}
+      <div class="col-md-6 col-lg-4 ">
+
+        <article class="post-news post-news-wide">
+          {% if driver.photo %}
+          <a href="driver-{{ driver.id }}">
+            <img class="img-responsive" src="{{ driver.photo.url }}" width="700" height="455" alt="">
+          </a>
+          {% else %}
+          <!-- Код для случая, когда у водителя нет фотографии -->
+          <a href="driver-{{driver.id}}">
+            <img class="img-responsive" src="{% static '../media/images/default.png'%}" width="700" height="455" alt="">
+          </a>
+          {% endif %}
+          <a href="driver-{{driver.id}}">
+            <div class="post-news-body">
+              <h4>{{ driver.name }}</h6>
+              <p>{{ driver.phone }}</p>
+              <p>{{ driver.auto }}</p>
+              <div class="offset-top-20">
+              </div>
+
+              <div class="post-news-meta offset-top-20"><i class="fa fa-money" aria-hidden="true"></i><span
+                  class="align-middle inset-left-10 fst-italic text-black">{{ driver.cash|intcomma }} so'm</span></div>
+
+            </div>
+          </a>
+        </article>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% include "./footer.html" %}
+<!-- Corporate footer-->
+
+<script src="{% static 'js/core.min.js' %}"></script>
+<script src="{% static 'js/script.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,251 @@
+{% extends "./base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block body %}
+{% include "./header1.html" %}
+<section class="section section-xl bg-catskill">
+  <div class="container">
+    <div class="row row-30 justify-content-sm-center">
+      <div class="col-md-5 col-lg-4 text-md-start">
+        <div class="inset-md-right-30">
+          {% if driver.photo %}
+          <img class="img-responsive d-inline-block"src="{{ driver.photo.url }}" width="340" height="340" alt="">
+          {% else %}
+          <img class="img-responsive d-inline-block" src="{% static '../media/images/default.png' %}" width="340" height="340" alt="">
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-md-7 col-lg-8 text-start">
+        <div>
+          <h2 class="fw-bold">{{ driver.name }}</h2>
+        </div>
+        <div class="offset-top-15 offset-sm-top-30">
+          <hr class="divider bg-madison hr-left-0">
+        </div>
+        <div class="offset-top-10 offset-md-top-30">
+          <h6 class="fw-bold"><a href="tel:{{ driver.phone }} ">{{ driver.phone }} </a></h6>
+          <div class="text-subline"></div>
+        </div>
+        <div class="offset-top-20">
+          <p>Mashina modeli:&nbsp;{{ driver.auto }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="row row-30 text-md-start justify-content-sm-center">
+      <div class="offset-top-60">
+        <div class="table-responsive clearfix">
+          <table class="table-dark-blue table-custom table table-custom-wrap">
+            <tbody>
+              <tr>
+                <th></th>
+                <th>Mahsulot nomlari</th>
+                <th>Skladdagi soni(korobka)</th>
+                <th>Korobkadagi soni</th>
+                <th>Narxi</th>
+                <th>Soni(korobka)</th>
+                <!-- <th>Summa</th> -->
+              </tr>
+              {% for product in products %}
+              <tr>
+                <td class="text-center p">{{ forloop.counter }}</td>
+                <td><a class="link-primary" href="single-product.html">{{ product.name }}</a></td>
+                <td>{{ product.count|intcomma }}</td>
+                <td id="count_case">{{ product.case }}</td>
+                <td><input class="form-input input-sm product-price d-inline-block" type="" data-zeros="true" value={{product.price}} min="0" max="999999"  style="width: 120px; height: 35px"> so'm</td>
+                <td><input class="form-input input-sm product-quantity" type="" data-zeros="true" value="0" min="0" max={{product.count}}  style="width: 60px; height: 35px"></td>
+                <!-- <td class="fw-bold text-black" id="total_sum"></td> -->
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="offset-top-30 clearfix">
+        <p id="total-sum" class="float-end inset-xl-right-70"><span class="h4 inset-left-20"></span></p>
+        </div>
+      <div class="offset-top-20 text-md-start">
+        <button onclick="blockButton(this)" id="save-button" class="btn button-primary btn-icon btn-icon-right float-md-end offset-top-10 offset-sm-top-0">
+            <span class="icon fa fa-arrow-right"></span>
+            <span>Saqlash</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% include "./footer.html" %}
+<!-- Corporate footer-->
+<!-- js -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+  function blockButton(button) {
+    button.disabled = true; // Блокируем кнопку
+    button.innerText = 'Kutip turing...'; // Изменяем текст на кнопке
+    // Ваш код для обработки клика здесь...
+    setTimeout(function() {
+        button.disabled = false; // Разблокируем кнопку
+        button.innerText = 'Saqlash'; // Восстанавливаем исходный текст
+    }, 1400); // Задержка в 2 секунды (2000 миллисекунд)
+  }
+</script>
+<script>
+    
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", $('input[name="csrfmiddlewaretoken"]').val());
+            }
+        }
+    });
+    
+    // Теперь ваши запросы будут автоматически включать CSRF-токен
+    
+        $(document).ready(function () {
+            $('#save-button').click(function (event) {
+                event.preventDefault();  // Предотвращает стандартное поведение кнопки
+    
+                var products = [];  // Массив для хранения данных о продуктах
+    
+                // Проходим по каждой строке таблицы, исключая заголовок
+                $('table.table-dark-blue tbody tr').each(function () {
+                    var name = $(this).find('td').eq(1).text().trim();
+                    var price = $(this).find('input.product-price').val();
+                    var count = $(this).find('input.product-quantity').val();
+    
+                    // Добавляем объект с данными продукта в массив
+                    products.push({
+                        name: name,
+                        price: price,
+                        count: count
+                    });
+                });
+                var data = {
+                    driverId: '{{ driver.id }}', // Используем значение driver.id из шаблона Django
+                    products: products
+                };
+                // Отправляем данные на сервер
+                $.ajax({
+                    url: '/process-products/',  // URL для обработки данных на сервере
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),  // Преобразование объекта в строку JSON
+                    success: function (response) {
+                        alert("Malumotlar saqlandi");  // Отображение сообщения об успешной отправке данных
+                        window.location.href = '/document/1/';  // Перенаправление на другую страницу
+                    },
+                    error: function () {
+                        alert('Malumotlarni kiritishdagi xatolik.');  // Отображение сообщения об ошибке
+                    }
+                });
+            });
+        });
+    
+</script>
+<script>
+    // Get all input fields with the class 'product-quantity'
+    const quantityInputs = document.querySelectorAll('.product-quantity');
+    const totalSumDisplay = document.getElementById('total-sum');
+
+    // Function to calculate the total sum
+    function calculateTotalSum() {
+        let totalSum = 0;
+
+        // Iterate through each input field
+        quantityInputs.forEach(input => {
+            // Convert the input value to a number
+            const quantity = parseFloat(input.value) || 0; // Default to 0 if value is empty or not a number
+
+            // Add the quantity to the total sum
+            totalSum += quantity;
+        });
+
+        // Display the total sum
+        totalSumDisplay.textContent = 'Jami: ' + totalSum;
+    }
+
+    // Add event listener to each input field to calculate total sum on input and change
+    quantityInputs.forEach(input => {
+        input.addEventListener('input', calculateTotalSum);
+        input.addEventListener('change', calculateTotalSum);
+    });
+
+    // Calculate total sum initially when the page loads
+    calculateTotalSum();
+
+    
+</script>
+
+<!-- <script>
+  // Функция для обновления ячейки суммы
+  function updateTotalSum(row) {
+    var price = parseFloat(row.querySelector('.product-price').value);
+    var quantity = parseInt(row.querySelector('.product-quantity').value);
+    var totalSumCell = row.querySelector('.fw-bold.text-black');
+
+    if (!isNaN(price) && !isNaN(quantity)) {
+      totalSumCell.textContent = (price * quantity).toFixed(2);
+    } else {
+      totalSumCell.textContent = '';
+    }
+  }
+
+  // Функция для обновления всех сумм
+  function updateAllTotalSums() {
+    var rows = document.querySelectorAll('tbody tr');
+    rows.forEach(function(row) {
+      updateTotalSum(row);
+    });
+  }
+
+  // Вызов функции для обновления всех сумм при загрузке страницы
+  window.addEventListener('load', function() {
+    updateAllTotalSums();
+  });
+
+  // Вызов функции для обновления сумм при изменении значений в полях ввода
+  var productQuantities = document.querySelectorAll('.product-quantity');
+  productQuantities.forEach(function(input) {
+    input.addEventListener('input', function() {
+      updateTotalSum(this.closest('tr'));
+    });
+  });
+
+  // Функция для умножения и обновления ячейки суммы по заданным значениям
+  function updateLastRowMultiplication() {
+    var lastRow = document.querySelector('tbody tr:last-child');
+    var cells = lastRow.querySelectorAll('td');
+
+    var countCase = parseInt(cells[3].textContent); // Значение из ячейки "Korobkadagi soni"
+    var price = parseFloat(cells[4].querySelector('.product-price').value); // Значение из поля ввода цены
+    var quantity = parseInt(cells[5].querySelector('.product-quantity').value); // Значение из поля ввода количества
+
+    if (!isNaN(countCase) && !isNaN(price) && !isNaN(quantity)) {
+      var totalSum = countCase * price * quantity;
+      cells[6].textContent = totalSum.toFixed(2);
+    } else {
+      cells[6].textContent = '';
+    }
+  }
+
+  // Вызов функции для умножения и обновления ячейки суммы в последней строке при загрузке страницы
+  window.addEventListener('load', function() {
+    updateLastRowMultiplication();
+  });
+
+  // Вызов функции для умножения и обновления ячейки суммы в последней строке при изменении значений в полях ввода
+  var lastRowInputs = document.querySelectorAll('tbody tr:last-child .product-price, tbody tr:last-child .product-quantity');
+  lastRowInputs.forEach(function(input) {
+    input.addEventListener('input', function() {
+      updateLastRowMultiplication();
+    });
+  });
+</script> -->
+
+
+
+<!-- js -->
+
+<script src="{% static 'js/core.min.js' %}"></script>
+<script src="{% static 'js/script.js' %}"></script>
+{% endblock %}
