@@ -92,7 +92,7 @@ class Payment(models.Model):
 #2-block
 class ConstructionSite(models.Model):
     name = models.CharField(max_length=255)
-    responsible_person = models.ForeignKey('ResponsiblePerson', on_delete=models.SET_NULL, null=True)
+    
 
     def __str__(self):
         return self.name
@@ -108,6 +108,7 @@ class ConstructionSiteImage(models.Model):
 class ResponsiblePerson(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=15)
+    сonstruction_site = models.ForeignKey('ConstructionSite', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.user.get_full_name()
