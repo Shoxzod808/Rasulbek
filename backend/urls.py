@@ -3,7 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
 from .views import login_view, index, logout_view, kirim, document, documents, process_payment, finance_driver, finance_driver_detail
-from .views import chiqim, save_products, driver, process_products, select_documents, save_table_data, inventory
+from .views import chiqim, save_products, driver, process_products, select_documents, save_table_data, inventory, stroy
 
 urlpatterns = [
     path('login/', login_view, name='login'),
@@ -23,6 +23,7 @@ urlpatterns = [
     path('save-products/', save_products, name='save_products'),
     path('process-products/', process_products, name='process_products'),
     path('process-payment/', process_payment, name='process_payment'),
+    path('stroy-<int:id>', stroy, name='stroy'),
     path('save-table-data/', save_table_data, name='save_table_data'),
 ]
 

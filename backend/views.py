@@ -254,11 +254,19 @@ def index(request):
         return render(request, '1-block/bugalter.html', context)
     
     elif request.user.groups.filter(name='Стройка').exists():
-        return render(request, '2-block/stroy.html', context)
+        return render(request, '2-block/stroyka.html', context)
     else:
         # Если пользователь не входит ни в одну из этих групп
         return HttpResponse("У вас нет прав для просмотра этой страницы.")
 
+@login_required
+def stroy(request, id):
+    context = dict()
+    if request.user.groups.filter(name='Стройка').exists():
+        return render(request, '2-block/stroy.html', context)
+    else:
+        # Если пользователь не входит ни в одну из этих групп
+        return HttpResponse("У вас нет прав для просмотра этой страницы.")
 
 @login_required
 def kirim(request):

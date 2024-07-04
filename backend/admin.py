@@ -50,7 +50,7 @@ class ConstructionSiteImageInline(admin.TabularInline):
     extra = 1
 
 class ConstructionSiteAdmin(admin.ModelAdmin):
-    list_display = ('name', 'responsible_person')
+    list_display = ('name',)
     search_fields = ('name', 'location')
     inlines = [ConstructionSiteImageInline]
 
