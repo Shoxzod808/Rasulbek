@@ -89,16 +89,36 @@
                       <th>Сумма</th>
                     </tr>
                     <tr style="width: calc(50%-40px);">
-                      <td>01.07.2024</td>
+                      <td data-toggle="modal" data-target="#exampleModalLong">01.07.2024</td>
                       <td>Timothy</td>
                       <td>Richards</td>
                     </tr>
+
                     <tr style="width: calc(50%-40px);">
                       <td>2.07.2024</td>
                       <td>Raymond</td>
                       <td>Hawkins</td>
                     </tr>
                   </table>
+                </div>
+                <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        ...
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </section>
             </div>
@@ -135,6 +155,8 @@
   </section>
 </div>
 <!-- Corporate footer-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'js/core.min.js' %}"></script>
 <script src="{% static 'js/script.js' %}"></script>
 {% endblock %}
