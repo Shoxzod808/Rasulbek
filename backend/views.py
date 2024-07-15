@@ -248,7 +248,41 @@ def index(request):
         context['count'] += i.count
     # Проверяем, принадлежит ли пользователь к группе "Склад"
     if request.user.groups.filter(name='Склад').exists():
-        return render(request, 'index-1.html', context)
+        refresh_count_for_products()
+        drivers_list = list(Driver.objects.all().order_by('name'))*25
+
+        drivers = []
+        for driver in  drivers_list:
+            cash = 0
+            for payment in Payment.objects.filter(driver=driver):
+                cash -= payment.cash
+            for order in Order.objects.filter(driver=driver):
+                order_cash = order.cash
+                for refund in Refund.objects.filter(order=order):
+                    for refund_product in refund.Refund.all():
+                        order_cash -= refund_product.product.case * refund_product.count * refund_product.price
+                cash += order_cash
+            drivers.append(
+                {
+                    'id': driver.id,
+                    'photo': driver.photo,
+                    'name': driver.name,
+                    'phone': driver.phone,
+                    'auto': driver.auto,
+                    'cash': cash
+                }
+            )
+        context = {
+            'id': 1,
+            'drivers': drivers,
+        }
+        
+        # Проверяем, принадлежит ли пользователь к группе "Склад"
+        if request.user.groups.filter(name='Склад').exists():
+            return render(request, 'chiqim.html', context)
+        else:
+            # Если пользователь не входит ни в одну из этих групп
+            return HttpResponse("У вас нет прав для просмотра этой страницы.")
     # Проверяем, принадлежит ли пользователь к группе "Менеджер"
     elif request.user.groups.filter(name='Бугалтер').exists():
         return render(request, '1-block/bugalter.html', context)
