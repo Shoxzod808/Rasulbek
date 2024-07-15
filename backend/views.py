@@ -288,7 +288,7 @@ def kirim(request):
 @login_required
 def chiqim(request):
     refresh_count_for_products()
-    drivers_list = list(Driver.objects.all().order_by('name'))
+    drivers_list = list(Driver.objects.all().order_by('name'))*25
 
     drivers = []
     for driver in  drivers_list:
@@ -357,7 +357,7 @@ def finance(request):
 @login_required
 def finance_driver(request):
     refresh_count_for_products()
-    drivers_list = list(Driver.objects.all())
+    drivers_list = list(Driver.objects.all())*25
     total_cash = 0
     drivers = []
     for driver in  drivers_list:

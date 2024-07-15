@@ -10,8 +10,8 @@ class Product(models.Model):
     count = models.IntegerField(default=0, verbose_name='qoldiq')
     
     class Meta:
-        verbose_name = 'maxsulot'
-        verbose_name_plural = 'maxsulotlar'
+        verbose_name = 'maxsulot(1)'
+        verbose_name_plural = 'maxsulotlar(1)'
 
     def total_price(self):
         return self.price * self.count * self.case
@@ -45,11 +45,11 @@ class Driver(models.Model):
     photo = models.ImageField(upload_to='images/', blank=True, null=True)
     name = models.CharField(max_length=255, verbose_name='FIO')
     phone = models.CharField(max_length=255, verbose_name='Telefon')
-    auto = models.CharField(max_length=255, verbose_name='Avtomobil')
+    auto = models.CharField(max_length=255, default='-', verbose_name='Izoh')
 
     class Meta:
-        verbose_name = 'client'
-        verbose_name_plural = 'clientlar'
+        verbose_name = 'client(1)'
+        verbose_name_plural = 'clientlar(1)'
 
     def __str__(self):
         return self.name
@@ -61,8 +61,8 @@ class OrderProduct(models.Model):
     order = models.ForeignKey('Order', related_name='Order', on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = 'chiqim(maxsulot)'
-        verbose_name_plural = 'chiqim(maxsulot)'
+        verbose_name = 'chiqim(maxsulot)(1)'
+        verbose_name_plural = 'chiqim(maxsulot)(1)'
 
     def __str__(self):
         return f"{self.product}"
@@ -74,8 +74,8 @@ class Order(models.Model):
 
 
     class Meta:
-        verbose_name = 'chiqim'
-        verbose_name_plural = 'chiqim'
+        verbose_name = 'chiqim(1)'
+        verbose_name_plural = 'chiqim(1)'
 
     def __str__(self):
         return f"{self.driver}-{self.created_date}"   

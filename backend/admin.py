@@ -5,14 +5,14 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'price', 'case', 'count')
     search_fields = ('name',)
 
-class InventoryProductAdmin(admin.ModelAdmin):
+""" class InventoryProductAdmin(admin.ModelAdmin):
     list_display = ('product', 'count', 'inventory')
     search_fields = ('product__name',)
-    list_filter = ('inventory',)
+    list_filter = ('inventory',) """
 
-class InventoryAdmin(admin.ModelAdmin):
+""" class InventoryAdmin(admin.ModelAdmin):
     list_display = ('created_date',)
-    date_hierarchy = 'created_date'
+    date_hierarchy = 'created_date' """
 
 class DriverAdmin(admin.ModelAdmin):
     list_display = ('name', 'phone', 'auto')
@@ -32,8 +32,8 @@ class OrderAdmin(admin.ModelAdmin):
 
 # Регистрация моделей
 admin.site.register(Product, ProductAdmin)
-admin.site.register(InventoryProduct, InventoryProductAdmin)
-admin.site.register(Inventory, InventoryAdmin)
+""" admin.site.register(InventoryProduct, InventoryProductAdmin)
+admin.site.register(Inventory, InventoryAdmin) """
 admin.site.register(Driver, DriverAdmin)
 admin.site.register(OrderProduct, OrderProductAdmin)
 admin.site.register(Order, OrderAdmin)

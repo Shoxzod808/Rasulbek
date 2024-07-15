@@ -5,6 +5,8 @@
 {% include "./header1.html" %}
 <section class="section section-xl bg-catskill">
   <div class="container">
+    <h2 class="fw-bold">Chiqim</h2>
+
     <div class="row row-30 text-md-start justify-content-sm-center">
       {% for driver in drivers %}
       <div class="col-md-6 col-lg-4 ">
@@ -15,8 +17,9 @@
             <img class="img-responsive" src="{{ driver.photo.url }}" width="700" height="455" alt="">
           </a>
           {% else %}
+          <!-- Код для случая, когда у водителя нет фотографии -->
           <a href="driver-{{driver.id}}">
-            <img class="img-responsive" src="{% static '../media/images/default.webp'%}" width="700" height="455" alt="">
+            <img class="img-responsive" src="{% static '../media/images/default.png'%}" width="700" height="455" alt="">
           </a>
           {% endif %}
           <a href="driver-{{driver.id}}">

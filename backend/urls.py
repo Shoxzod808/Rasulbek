@@ -7,7 +7,8 @@ from .views import chiqim, save_products, driver, process_products, select_docum
 
 urlpatterns = [
     path('login/', login_view, name='login'),
-    path('', index, name='home'),
+    #path('', index, name='home'),
+    path('', chiqim, name='chiqim'),
     path('chiqim', chiqim, name='chiqim'),
     path('driver-<int:id>', driver, name='driver'),
     path('kirim', kirim, name='kirim'),
