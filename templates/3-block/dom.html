@@ -1,0 +1,111 @@
+{% extends "./base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block body %}
+{% include "./header4.html" %}
+<section class="section section-xl">
+    <h2 class="fw-bold offset-top-60 ">Подробнее о доме</h2>
+    <hr class="divider bg-madison ">
+    <div class="container offset-top-40">
+      <div class="row row-30 justify-content-sm-center">
+        <div class="col-md-4 col-lg-4 text-md-start">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4313.41015243019!2d60.61284467591252!3d41.57222068292047!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x41dfcfa155e57805%3A0x42f1e95b7cdf7bd2!2sUrganch%20innovatsion%20universiteti!5e0!3m2!1sru!2s!4v1721042146212!5m2!1sru!2s" width="350" height="300" style="border: 1px solid #000;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          
+        </div>
+        <div class="col-md-8 col-lg-8 text-center">
+          <div>
+            <h3 class="fw-bold">Адресс</h3>
+          </div>
+          <div class="offset-top-10 offset-md-top-30">
+            
+            <hr>
+            <h6>Этажность дома:</h6>
+            <h6>Количества подезда:</h6>
+            <h6>Количества квартир:</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+<div class="tabs-custom tabs-horizontal tabs-line" id="tabs-1">
+    <!--Nav tabs-->
+    <div class="container">
+        <ul class="nav nav-tabs justify-content-center">
+            <li class="nav-item" role="presentation"><a class="nav-link" href="#tabs-1-1"
+                    data-toggle="tab">Проданные</a></li>
+            <li class="nav-item" role="presentation"><a class="nav-link" href="#tabs-1-2"
+                    data-toggle="tab">Непроданые</a></li>
+        </ul>
+        <div class="tab-content text-center">
+            <div class="tab-pane fade" id="tabs-1-1">
+                <section class="section section-lg">
+                    <h4 class="fw-bold">Проданные</h4>
+                    <hr class="divider bg-madison">
+                    <div class="row offset-md-top-30 justify-content-sm-center">
+                        <!-- Classic Responsive Table-->
+                        <table
+                            class="table table-custom table-dark-blue table-fixed w-100 text-center text-black">
+                            <tr style="width: 80px;">
+                                <th>No</th>
+                                <th>Сотрудник</th>
+                                <th>Сумма</th>
+                            </tr>
+                            <tr style="width: calc(50%-40px);">
+                                <td>01.07.2024</td>
+                                <td>Timothy</td>
+                                <td>Richards</td>
+                            </tr>
+                            <tr style="width: calc(50%-40px);">
+                                <td>2.07.2024</td>
+                                <td>Raymond</td>
+                                <td>Hawkins</td>
+                            </tr>
+                        </table>
+                    </div>
+                </section>
+            </div>
+            <div class="tab-pane fade" id="tabs-1-2">
+                <section class="section section-lg">
+                    <h4 class="fw-bold">Непроданые</h4>
+                    <hr class="divider bg-madison">
+                    <div class="row offset-md-top-30 justify-content-sm-center">
+                        <!-- Classic Responsive Table-->
+
+                        <table
+                            class="table table-custom table-dark-blue table-fixed w-100 text-center text-black">
+                            <tr style="width: 80px;">
+                                <th>Дата</th>
+                                <th>Сотрудник</th>
+                                <th>Сумма</th>
+                            </tr>
+                            <tr style="width: calc(50%-40px);">
+                                <td>01.07.2024</td>
+                                <td>Timothy</td>
+                                <td>Richards</td>
+                            </tr>
+                            <tr style="width: calc(50%-40px);">
+                                <td>2.07.2024</td>
+                                <td>Raymond</td>
+                                <td>Hawkins</td>
+                            </tr>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+
+
+<script src="{% static 'js/core.min.js' %}"></script>
+<script src="{% static 'js/script.js' %}"></script>
+{% endblock %}
