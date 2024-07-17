@@ -3,8 +3,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.contrib.auth import logout
-from .models import Product, Driver, Inventory, InventoryProduct
-from .models import Order, OrderProduct, Payment
+from .models import *
 from .utils import refresh_count_for_products
 
 import json
@@ -50,15 +49,15 @@ def process_payment(request):
     if request.method == 'POST':
         # Получаем данные из POST-запроса
         payment_amount = request.POST.get('paymentAmount')
-        driver_id = request.POST.get('driverId')
+        client_id = request.POST.get('clientId')
         if int(payment_amount) <= 0:
             raise ValueError()
-        driver = Driver.objects.get(id=driver_id)
+        client = Client.objects.get(id=client_id)
         payment = Payment.objects.create(
-            driver=driver,
+            client=client,
             cash = int(payment_amount)
             )
-        if payment_amount and driver_id:
+        if payment_amount and client_id:
             # Здесь вы можете обработать оплату и выполнить любую другую логику
             return JsonResponse({'success': True})
         else:
@@ -74,10 +73,10 @@ def process_products(request):
         # Получите данные из запроса
         data = json.loads(request.body)
         products = data.get('products')
-        driver_id = data.get('driverId')
+        client_id = data.get('clientId')
         status = False
         order = None
-        driver = Driver.objects.get(id=driver_id)
+        client = Client.objects.get(id=client_id)
         cash = 0
         for data in products:
             if 'count' in data and data['count'] != '' and int(data['count']) > 0:
@@ -88,7 +87,7 @@ def process_products(request):
             if 'count' in data and data['count'] != '' and int(data['count']) > 0:
                 if not status:
                     order = Order.objects.create(
-                    driver=driver,
+                    client=client,
                     )
                     status = True
                 product = Product.objects.get(name=data['name'])
@@ -115,7 +114,7 @@ def document(request, id=1):
         order = list(Order.objects.all())[-1]
     else:
         order = Order.objects.get(id=id)
-    driver = order.driver
+    client = order.client
     order_products = OrderProduct.objects.filter(order=order)
     total_sum = 0
     products = []
@@ -132,7 +131,7 @@ def document(request, id=1):
         )
         total_sum += order_product.product.case * order_product.count * order_product.price
     context['products'] = products
-    context['driver'] = driver
+    context['client'] = client
     context['total_sum'] = total_sum
     context['order'] = order
     # Проверяем, принадлежит ли пользователь к группе "Склад"
@@ -146,7 +145,7 @@ def document(request, id=1):
 def inventory(request, id=1):
     context = dict()
     inventory = Inventory.objects.get(id=id)
-    products = InventoryProduct.objects.filter(inventory=inventory)
+    products = InventoryIngredient.objects.filter(inventory=inventory)
     total_count = 0
     for product in products:
         total_count += product.count
@@ -206,7 +205,7 @@ def save_products(request):
                     inventory = Inventory.objects.create()
                     status = True
                 product = Product.objects.get(name=data['name'])
-                inventory_product = InventoryProduct.objects.create(
+                inventory_product = InventoryIngredient.objects.create(
                     product=product,
                     count=int(data['quantity']),
                     inventory=inventory
@@ -237,53 +236,12 @@ def login_view(request):
 
 @login_required
 def index(request):
-    refresh_count_for_products()
     context = dict()
-    context['products'] = list(Product.objects.filter(count__gt=0).order_by('name'))         
-    context['summa'] = 0
-    for i in Product.objects.all():
-        context['summa'] += i.total_price()
-    context['count'] = 0
-    for i in Product.objects.all():
-        context['count'] += i.count
     # Проверяем, принадлежит ли пользователь к группе "Склад"
     if request.user.groups.filter(name='Склад').exists():
         refresh_count_for_products()
-        drivers_list = list(Driver.objects.all().order_by('name'))*25
-
-        drivers = []
-        for driver in  drivers_list:
-            cash = 0
-            for payment in Payment.objects.filter(driver=driver):
-                cash -= payment.cash
-            for order in Order.objects.filter(driver=driver):
-                order_cash = order.cash
-                for refund in Refund.objects.filter(order=order):
-                    for refund_product in refund.Refund.all():
-                        order_cash -= refund_product.product.case * refund_product.count * refund_product.price
-                cash += order_cash
-            drivers.append(
-                {
-                    'id': driver.id,
-                    'photo': driver.photo,
-                    'name': driver.name,
-                    'phone': driver.phone,
-                    'auto': driver.auto,
-                    'cash': cash
-                }
-            )
-        context = {
-            'id': 1,
-            'drivers': drivers,
-        }
-        
-        # Проверяем, принадлежит ли пользователь к группе "Склад"
-        if request.user.groups.filter(name='Склад').exists():
-            return render(request, 'chiqim.html', context)
-        else:
-            # Если пользователь не входит ни в одну из этих групп
-            return HttpResponse("У вас нет прав для просмотра этой страницы.")
-    # Проверяем, принадлежит ли пользователь к группе "Менеджер"
+        context['ingredients'] = list(Ingredient.objects.filter(weight__gt=0).order_by('name'))    
+        return render(request, 'index-1.html', context)
     elif request.user.groups.filter(name='Бугалтер').exists():
         return render(request, '1-block/bugalter.html', context)
     
@@ -322,32 +280,32 @@ def kirim(request):
 @login_required
 def chiqim(request):
     refresh_count_for_products()
-    drivers_list = list(Driver.objects.all().order_by('name'))*25
+    clients_list = list(Client.objects.all().order_by('name'))*25
 
-    drivers = []
-    for driver in  drivers_list:
+    clients = []
+    for client in  clients_list:
         cash = 0
-        for payment in Payment.objects.filter(driver=driver):
+        for payment in Payment.objects.filter(client=client):
             cash -= payment.cash
-        for order in Order.objects.filter(driver=driver):
+        for order in Order.objects.filter(client=client):
             order_cash = order.cash
             for refund in Refund.objects.filter(order=order):
                 for refund_product in refund.Refund.all():
                     order_cash -= refund_product.product.case * refund_product.count * refund_product.price
             cash += order_cash
-        drivers.append(
+        clients.append(
             {
-                'id': driver.id,
-                'photo': driver.photo,
-                'name': driver.name,
-                'phone': driver.phone,
-                'auto': driver.auto,
+                'id': client.id,
+                'photo': client.photo,
+                'name': client.name,
+                'phone': client.phone,
+                'auto': client.auto,
                 'cash': cash
             }
         )
     context = {
         'id': 1,
-        'drivers': drivers,
+        'clients': clients,
     }
     
     # Проверяем, принадлежит ли пользователь к группе "Склад"
@@ -358,14 +316,14 @@ def chiqim(request):
         return HttpResponse("У вас нет прав для просмотра этой страницы.")
     
 @login_required
-def driver(request, id=1):
-    driver = Driver.objects.get(id=id)
+def client(request, id=1):
+    client = Client.objects.get(id=id)
     context = dict()
     context['products'] = list(Product.objects.filter(count__gt=0).order_by('name'))
-    context['driver'] = driver
+    context['client'] = client
     # Проверяем, принадлежит ли пользователь к группе "Склад"
     if request.user.groups.filter(name='Склад').exists():
-        return render(request, 'driver.html', context)
+        return render(request, 'client.html', context)
     else:
         # Если пользователь не входит ни в одну из этих групп
         return HttpResponse("У вас нет прав для просмотра этой страницы.")
@@ -389,40 +347,40 @@ def finance(request):
         return HttpResponse("У вас нет прав для просмотра этой страницы.") """
 
 @login_required
-def finance_driver(request):
+def finance_client(request):
     refresh_count_for_products()
-    drivers_list = list(Driver.objects.all())*25
+    clients_list = list(Client.objects.all())*25
     total_cash = 0
-    drivers = []
-    for driver in  drivers_list:
+    clients = []
+    for client in  clients_list:
         cash = 0
-        for order in Order.objects.filter(driver=driver):
+        for order in Order.objects.filter(client=client):
             order_cash = order.cash
             for refund in Refund.objects.filter(order=order):
                 for refund_product in refund.Refund.all():
                     order_cash -= refund_product.product.case * refund_product.count * refund_product.price
             cash += order_cash
-        for payment in Payment.objects.filter(driver=driver):
+        for payment in Payment.objects.filter(client=client):
             cash -= payment.cash
-        drivers.append(
+        clients.append(
             {
-                'id': driver.id,
-                'photo': driver.photo,
-                'name': driver.name,
-                'phone': driver.phone,
-                'auto': driver.auto,
+                'id': client.id,
+                'photo': client.photo,
+                'name': client.name,
+                'phone': client.phone,
+                'auto': client.auto,
                 'cash': cash
             }
         )
         total_cash += cash
     context = {
         'id': 1,
-        'drivers': drivers,
+        'clients': clients,
         'total_cash': total_cash
     }
     # Проверяем, принадлежит ли пользователь к группе "Склад"
     if request.user.groups.filter(name='Склад').exists():
-        return render(request, 'finance-driver.html', context)
+        return render(request, 'finance-client.html', context)
     else:
         # Если пользователь не входит ни в одну из этих групп
         return HttpResponse("У вас нет прав для просмотра этой страницы.")
@@ -463,38 +421,38 @@ def order_detail(request, id=1):
         return HttpResponse("У вас нет прав для просмотра этой страницы.") """
 
 @login_required
-def finance_driver_detail(request, id=1):
+def finance_client_detail(request, id=1):
     context = dict()
-    driver = Driver.objects.get(id=id)
+    client = Client.objects.get(id=id)
     orders = Order.objects.all()
-    payments = Payment.objects.filter(driver=driver)
+    payments = Payment.objects.filter(client=client)
 
     cash = 0
-    for order in Order.objects.filter(driver=driver):
+    for order in Order.objects.filter(client=client):
         order_cash = order.cash
         """ for refund in Refund.objects.filter(order=order):
             for refund_product in refund.Refund.all():
                 order_cash -= refund_product.product.case * refund_product.count * refund_product.price """
         cash += order_cash
-    """ for payment in Payment.objects.filter(driver=driver):
+    """ for payment in Payment.objects.filter(client=client):
         cash -= payment.cash """
-    context['driver'] = {
-            'driver':driver,
-            'id': driver.id,
-            'photo': driver.photo,
-            'name': driver.name,
-            'phone': driver.phone,
-            'auto': driver.auto,
+    context['client'] = {
+            'client':client,
+            'id': client.id,
+            'photo': client.photo,
+            'name': client.name,
+            'phone': client.phone,
+            'auto': client.auto,
             'cash': cash
     }
     
 
-    orders = Order.objects.filter(driver=driver)
+    orders = Order.objects.filter(client=client)
     context['payments'] = payments
     context['orders'] = orders
     # Проверяем, принадлежит ли пользователь к группе "Склад"
     if request.user.groups.filter(name='Склад').exists():
-        return render(request, 'finance-driver-detail.html', context)
+        return render(request, 'finance-client-detail.html', context)
     else:
         # Если пользователь не входит ни в одну из этих групп
         return HttpResponse("У вас нет прав для просмотра этой страницы.")

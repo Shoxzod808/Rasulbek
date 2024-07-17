@@ -12,7 +12,16 @@
       <div class="col-md-6 col-lg-4 ">
 
         <article class="post-news post-news-wide">
-          
+          {% if driver.photo %}
+          <a href="driver-{{ driver.id }}">
+            <img class="img-responsive" src="{{ driver.photo.url }}" width="700" height="455" alt="">
+          </a>
+          {% else %}
+          <!-- Код для случая, когда у водителя нет фотографии -->
+          <a href="driver-{{driver.id}}">
+            <img class="img-responsive" src="{% static '../media/images/default.png'%}" width="700" height="455" alt="">
+          </a>
+          {% endif %}
           <a href="driver-{{driver.id}}">
             <div class="post-news-body">
               <h4>{{ driver.name }}</h6>

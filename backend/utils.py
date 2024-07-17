@@ -23,7 +23,7 @@ def get_document(id):
     result = FileForDocuments.objects.filter(document=id)
     return result """
 
-from .models import Product, InventoryProduct, OrderProduct, Payment, Order
+from .models import *
 def intcomma(number):
     """
     Функция для форматирования целых чисел с добавлением запятых как разделителя разрядов.
@@ -42,16 +42,22 @@ def intcomma(number):
     return ''.join(reversed(parts))
 
 def refresh_count_for_products():
-    products  = Product.objects.all()
-    for product in products:
-        product.count = 0
-        inventory_products = InventoryProduct.objects.filter(product=product)
-        order_products = OrderProduct.objects.filter(product=product)
+    #Checked
+    ingredients  = Ingredient.objects.all()
+    for ingredient in ingredients:
+        ingredient.weight = 0
+        inventory_products = InventoryIngredient.objects.filter(ingredient=ingredient.id)
+        print(inventory_products, 1212)
+        order_products = OrderProduct.objects.all()
         for p in inventory_products:
-            product.count += p.count
+            ingredient.weight += p.weight
         for p in order_products:
-            product.count -= p.count
-        product.save()
+            ings = ProductIngedients.objects.filter(product=p.id)
+            print(ings, 1121212)
+            if len(ings) > 0:
+                for ing in ings:
+                    ingredient.weight -= p.count*ing.weight
+        ingredient.save()
 
 
 def calculate_driver_cash(driver, payed):

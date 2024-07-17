@@ -1,21 +1,30 @@
 from django.contrib import admin
-from .models import Product, InventoryProduct, Inventory, Driver, OrderProduct, Order, Payment, ConstructionSite, ConstructionSiteImage, ResponsiblePerson, Store, PaymentRequest
+from .models import Product, Ingredient, ProductIngedients, InventoryIngredient, Inventory, Client, OrderProduct, Order, Payment, ConstructionSite, ConstructionSiteImage, ResponsiblePerson, Store, PaymentRequest
+
+class ProductIngedientsInline(admin.TabularInline):
+    model = ProductIngedients
+    extra = 1  #
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'case', 'count')
+    list_display = ('name',)
+    search_fields = ('name',)
+    inlines = [ProductIngedientsInline]
+
+class IngredientAdmin(admin.ModelAdmin):
+    list_display = ('name', 'weight')
     search_fields = ('name',)
 
-""" class InventoryProductAdmin(admin.ModelAdmin):
-    list_display = ('product', 'count', 'inventory')
-    search_fields = ('product__name',)
-    list_filter = ('inventory',) """
+class InventoryIngredientAdmin(admin.ModelAdmin):
+    list_display = ('ingredient', 'weight', 'inventory')
+    search_fields = ('ingredient__name',)
+    list_filter = ('inventory',) 
 
-""" class InventoryAdmin(admin.ModelAdmin):
+class InventoryAdmin(admin.ModelAdmin):
     list_display = ('created_date',)
-    date_hierarchy = 'created_date' """
+    date_hierarchy = 'created_date'
 
-class DriverAdmin(admin.ModelAdmin):
-    list_display = ('name', 'phone', 'auto')
+class ClientAdmin(admin.ModelAdmin):
+    list_display = ('name', 'phone', 'comment')
     search_fields = ('name', 'phone')
 
 class OrderProductAdmin(admin.ModelAdmin):
@@ -24,22 +33,26 @@ class OrderProductAdmin(admin.ModelAdmin):
     list_filter = ('order',)
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('created_date', 'driver', 'cash')
+    list_display = ('created_date', 'client', 'cash')
     date_hierarchy = 'created_date'
-    search_fields = ('driver__name',)
+    search_fields = ('client__name',)
 
+class ProductIngedientsAdmin(admin.ModelAdmin):
+    list_display = ('product', 'weight')
 
 
 # Регистрация моделей
+admin.site.register(ProductIngedients, ProductIngedientsAdmin)
 admin.site.register(Product, ProductAdmin)
-""" admin.site.register(InventoryProduct, InventoryProductAdmin)
-admin.site.register(Inventory, InventoryAdmin) """
-admin.site.register(Driver, DriverAdmin)
+admin.site.register(Ingredient, IngredientAdmin)
+admin.site.register(InventoryIngredient, InventoryIngredientAdmin)
+admin.site.register(Inventory, InventoryAdmin)
+admin.site.register(Client, ClientAdmin)
 admin.site.register(OrderProduct, OrderProductAdmin)
 admin.site.register(Order, OrderAdmin)
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('driver', 'cash', 'created_date')
+    list_display = ('client', 'cash', 'created_date')
     list_filter = ('created_date',)
 
 admin.site.register(Payment, PaymentAdmin)

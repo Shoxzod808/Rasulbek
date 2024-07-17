@@ -2,18 +2,18 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
-from .views import login_view, index, logout_view, kirim, document, documents, process_payment, finance_driver, finance_driver_detail
-from .views import chiqim, save_products, driver, process_products, select_documents, save_table_data, inventory, stroy
+from .views import login_view, index, logout_view, kirim, document, documents, process_payment, finance_client, finance_client_detail
+from .views import chiqim, save_products, client, process_products, select_documents, save_table_data, inventory, stroy
 
 urlpatterns = [
     path('login/', login_view, name='login'),
     path('', index, name='home'),
     path('chiqim', chiqim, name='chiqim'),
-    path('driver-<int:id>', driver, name='driver'),
+    path('driver-<int:id>', client, name='driver'),
     path('kirim', kirim, name='kirim'),
     #path('finance', finance, name='finance'),
-    path('finance-driver', finance_driver, name='finance_driver'),
-    path('finance-driver-detail/<int:id>', finance_driver_detail, name='finance_driver_detail'),
+    path('finance-driver', finance_client, name='finance_driver'),
+    path('finance-driver-detail/<int:id>', finance_client_detail, name='finance_driver_detail'),
     #path('order/<int:id>', order_detail, name='order_detail'),
     path('logout/', logout_view, name='logout'),
     path('document/<int:id>/', document, name='document'),
