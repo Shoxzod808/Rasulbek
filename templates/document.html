@@ -8,7 +8,7 @@
         <h6 class=" text-center"><b>Zakaz № {{order.id}}</b></h6>
      
         <br>
-        <p class="text-black" >Mijoz: {{ order.driver.name }}</p>
+        <p class="text-black" >Mijoz: {{ order.client.name }}</p>
         <p class="text-black" >Sana: {{ order.created_date }}</p>
         <p class="text-black" style="font-family:sans-serif; " >
             NURJON ALLAYOR XUSUSIY KORXONASI
@@ -21,8 +21,7 @@
                     <th width="30px">№</th>
                     <th>Nomi</th>
                     <th>Narxi</th>
-                    <th>Soni (korobka)</th>
-                    <th>Korobkadagi soni</th>
+                    <th>Soni(og'irligi, hajmi)</th>
                     <th>Summa</th>
                 </tr>
                 {% for product  in products %}
@@ -31,7 +30,6 @@
                         <td>{{ product.product.name }}</td>
                         <td>{{ product.price|intcomma }}</td>
                         <td>{{ product.count }}</td>
-                        <td >{{ product.product.case }}</td>
                         <td>{{ product.cash|intcomma }}</td>
                     </tr>
                 {% endfor %}
@@ -41,7 +39,7 @@
                 <b>Jami: {{ total_sum|intcomma }} so'm</b>
                 <br>
                 <br>
-                <b>Jami qarzi: {% call_calculate_driver_cash driver False%} so'm</b>
+                <b>Jami qarzi: ? so'm</b>
 
             </div>
 

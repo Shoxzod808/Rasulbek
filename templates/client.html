@@ -9,8 +9,8 @@
     <div class="row row-30 justify-content-sm-center">
       <div class="col-md-5 col-lg-4 text-md-start">
         <div class="inset-md-right-30">
-          <!-- {% if driver.photo %}
-          <img class="img-responsive d-inline-block"src="{{ driver.photo.url }}" width="340" height="340" alt="">
+          <!-- {% if client.photo %}
+          <img class="img-responsive d-inline-block"src="{{ client.photo.url }}" width="340" height="340" alt="">
           {% else %}
           <img class="img-responsive d-inline-block" src="{% static '../media/images/default.png' %}" width="340" height="340" alt="">
           {% endif %} -->
@@ -18,17 +18,17 @@
       </div>
       <div class="col-md-7 col-lg-8 text-start">
         <div>
-          <h2 class="fw-bold">{{ driver.name }}</h2>
+          <h2 class="fw-bold">{{ client.name }}</h2>
         </div>
         <div class="offset-top-15 offset-sm-top-30">
           <hr class="divider bg-madison hr-left-0">
         </div>
         <div class="offset-top-10 offset-md-top-30">
-          <h6 class="fw-bold"><a href="tel:{{ driver.phone }} ">{{ driver.phone }} </a></h6>
+          <h6 class="fw-bold"><a href="tel:{{ client.phone }} ">{{ client.phone }} </a></h6>
           <div class="text-subline"></div>
         </div>
         <div class="offset-top-20">
-          <p>Mashina modeli:&nbsp;{{ driver.auto }}</p>
+          <p>Izoh:&nbsp;{{ client.comment }}</p>
         </div>
       </div>
     </div>
@@ -40,19 +40,15 @@
               <tr>
                 <th></th>
                 <th>Mahsulot nomlari</th>
-                <th>Skladdagi soni(korobka)</th>
-                <th>Korobkadagi soni</th>
                 <th>Narxi</th>
-                <th>Soni(korobka)</th>
+                <th>Soni(Hajmi, ogirligi)</th>
                 <!-- <th>Summa</th> -->
               </tr>
               {% for product in products %}
               <tr>
                 <td class="text-center p">{{ forloop.counter }}</td>
                 <td><a class="link-primary" href="single-product.html">{{ product.name }}</a></td>
-                <td>{{ product.count|intcomma }}</td>
-                <td id="count_case">{{ product.case }}</td>
-                <td><input class="form-input input-sm product-price d-inline-block" type="" data-zeros="true" value={{product.price}} min="0" max="999999"  style="width: 120px; height: 35px"> so'm</td>
+                <td><input class="form-input input-sm product-price d-inline-block" type="" data-zeros="true" value='0' min="0" max="999999"  style="width: 120px; height: 35px"> so'm</td>
                 <td><input class="form-input input-sm product-quantity" type="" data-zeros="true" value="0" min="0" max={{product.count}}  style="width: 60px; height: 35px"></td>
                 <!-- <td class="fw-bold text-black" id="total_sum"></td> -->
               </tr>
@@ -121,7 +117,7 @@
                     });
                 });
                 var data = {
-                    driverId: '{{ driver.id }}', // Используем значение driver.id из шаблона Django
+                    clientId: '{{ client.id }}', // Используем значение client.id из шаблона Django
                     products: products
                 };
                 // Отправляем данные на сервер

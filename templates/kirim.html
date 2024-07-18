@@ -16,12 +16,12 @@
                             <tr>
                                 <th>№</th>
                                 <th>Mahsulot nomlari</th>
-                                <th>Soni(korobka)</th>
+                                <th>Soni</th>
                             </tr>
-                            {% for product in products %}
+                            {% for Ingredient in Ingredients %}
                             <tr>
                                 <td class="text-center p">{{ forloop.counter }}</td>
-                                <td><a class="link-primary" href="#">{{ product.name }}</a></td>
+                                <td><a class="link-primary" href="#">{{ Ingredient.name }}</a></td>
                                 <td>
                                     <input class="form-input input-sm product-quantity" type="" data-zeros="true"
                                         value="0" min="0" max="90000" style="width: 60px; height: 35px">

@@ -66,23 +66,33 @@ def process_payment(request):
         return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
+def process_products_check_ingredients(products):
+    refresh_count_for_products()
+    for ingredient in Ingredient.objects.all():
+        for data in products:
+            for data in products:
+                if 'count' in data and data['count'] != '' and int(data['count']) > 0:
+                    product = Product.objects.get(name=data['name'])
+                    for product_ingedient in ProductIngedients.objects.filter(product=product, ingredient=ingredient):
+                        ingredient.weight -= product_ingedient.weight
+        if ingredient.weight < 0:
+            return False
+    return True
 @csrf_exempt
 @require_http_methods(["POST"])
 def process_products(request):
     if request.method == 'POST':
         # Получите данные из запроса
         data = json.loads(request.body)
+        print(data)
         products = data.get('products')
         client_id = data.get('clientId')
         status = False
         order = None
         client = Client.objects.get(id=client_id)
         cash = 0
-        for data in products:
-            if 'count' in data and data['count'] != '' and int(data['count']) > 0:
-                product = Product.objects.get(name=data['name'])
-                if product.count < int(data['count']) or int(data['count']) < 0 or int(data['price']) < 0:
-                    raise ValueError()
+        if not process_products_check_ingredients(products):
+            return JsonResponse({'error': 'Invalid request method or not an AJAX request.'}, status=400)
         for data in products:
             if 'count' in data and data['count'] != '' and int(data['count']) > 0:
                 if not status:
@@ -97,7 +107,7 @@ def process_products(request):
                     order=order,
                     price=data['price'],
                 )
-                cash += int(order_product.count) * int(order_product.price) * product.case
+                cash += int(order_product.count) * int(order_product.price)
         order.cash = cash
         order.save()
         refresh_count_for_products()
@@ -126,10 +136,10 @@ def document(request, id=1):
                 'price': order_product.price,
                 'count': order_product.count,
                 'order': order_product.order,
-                'cash': order_product.product.case * order_product.count * order_product.price,
+                'cash': order_product.count * order_product.price,
             }
         )
-        total_sum += order_product.product.case * order_product.count * order_product.price
+        total_sum += order_product.count * order_product.price
     context['products'] = products
     context['client'] = client
     context['total_sum'] = total_sum
@@ -191,7 +201,6 @@ def save_products(request):
     try:
         data = json.loads(request.body)  # Преобразуем JSON из тела запроса в Python словарь
         products = data.get('products')
-        
         status = False
         inventory = None
         for data in products:
@@ -204,10 +213,10 @@ def save_products(request):
                 if not status:
                     inventory = Inventory.objects.create()
                     status = True
-                product = Product.objects.get(name=data['name'])
+                ingredient = Ingredient.objects.get(name=data['name'])
                 inventory_product = InventoryIngredient.objects.create(
-                    product=product,
-                    count=int(data['quantity']),
+                    ingredient=ingredient,
+                    weight=int(data['quantity']),
                     inventory=inventory
                 )
         # Обработка данных
@@ -274,13 +283,7 @@ def dom(request, id):
 @login_required
 def kirim(request):
     context = dict()
-    context['products'] = list(Product.objects.all().order_by('name'))
-    context['summa'] = 0
-    for i in Product.objects.all():
-        context['summa'] += i.total_price()
-    context['count'] = 0
-    for i in Product.objects.all():
-        context['count'] += i.count
+    context['Ingredients'] = list(Ingredient.objects.all().order_by('name'))
     # Проверяем, принадлежит ли пользователь к группе "Склад"
     if request.user.groups.filter(name='Склад').exists():
         return render(request, 'kirim.html', context)
@@ -300,17 +303,13 @@ def chiqim(request):
             cash -= payment.cash
         for order in Order.objects.filter(client=client):
             order_cash = order.cash
-            for refund in Refund.objects.filter(order=order):
-                for refund_product in refund.Refund.all():
-                    order_cash -= refund_product.product.case * refund_product.count * refund_product.price
             cash += order_cash
         clients.append(
             {
                 'id': client.id,
-                'photo': client.photo,
                 'name': client.name,
                 'phone': client.phone,
-                'auto': client.auto,
+                'auto': client.comment,
                 'cash': cash
             }
         )
@@ -330,7 +329,7 @@ def chiqim(request):
 def client(request, id=1):
     client = Client.objects.get(id=id)
     context = dict()
-    context['products'] = list(Product.objects.filter(count__gt=0).order_by('name'))
+    context['products'] = list(Product.objects.order_by('name'))
     context['client'] = client
     # Проверяем, принадлежит ли пользователь к группе "Склад"
     if request.user.groups.filter(name='Склад').exists():

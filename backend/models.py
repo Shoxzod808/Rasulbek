@@ -33,7 +33,6 @@ class ProductIngedients(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=255, unique=True, verbose_name='nomi')
 
-    
     class Meta:
         verbose_name = 'maxsulot(1)'
         verbose_name_plural = 'maxsulotlar(1)'
