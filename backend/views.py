@@ -78,6 +78,7 @@ def process_products_check_ingredients(products):
         if ingredient.weight < 0:
             return False
     return True
+
 @csrf_exempt
 @require_http_methods(["POST"])
 def process_products(request):
